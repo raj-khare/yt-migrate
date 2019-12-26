@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Youtube Migrate</title>
+    <link
+      rel="stylesheet"
+      href="https://bootswatch.com/4/lumen/bootstrap.min.css"
+    />
+  </head>
+  <body>
+    <div class="container text-center">
+      <h3 class="mt-5">
+        Youtube Migrate
+        <small class="text-muted"
+          >| Transfer your subscriptions to new account
+        </small>
+      </h3>
+
+      <img
+        src="https://cdn4.iconfinder.com/data/icons/logos-and-brands/512/395_Youtube_logo-512.png"
+        alt="YouTube logo"
+        style="width: 150px; margin: 0 auto; display: block; "
+      />
+      <button id="signin-old" class="btn btn-secondary">
+        Choose your old account
+      </button>
+      <button id="signin-new" class="btn btn-secondary d-none">
+        Choose your new account
+      </button>
+      <p
+        id="old-data"
+        style="margin-top: 10px; color: blue"
+        class="font-weight-bold"
+      ></p>
+      <button id="transfer" class="btn btn-secondary d-none">
+        Initiate tranfer
+      </button>
+      <h6 id="notifications" style="margin-top: 30px;"></h6>
+      <hr style="margin-top: 150px;" />
+      <p>
+        We don't misuse or store your data in any manner. Source code can be
+        found <a href="https://github.com/raj-khare/yt-migrate">here</a>
+      </p>
+      <p>
+        <strong>
+          Note: If you are getting 403 error, it's probably because quota is
+          exhausted.</strong
+        >
+      </p>
+    </div>
+
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="./main.js"></script>
+  </body>
+</html>
