@@ -28,7 +28,9 @@ if (!Promise.allSettled) {
 }
 
 const USER_DATA = {
-  subscriptions: []
+  oldSubscriptions: new Set(),
+  currentSubscriptions: new Set(),
+  newSubscriptionsCount: 0
 };
 
 gapi.load("client:auth2", () => {
@@ -63,9 +65,12 @@ const loadClient = () => {
     });
 };
 
-const getSubscriptions = (pageToken = null) => {
-  notify("Fetching your subscriptions...");
-
+const getSubscriptions = (type, pageToken = null) => {
+  notify(`Fetching your ${type} subscriptions...`);
+  const userData =
+    type === "old"
+      ? USER_DATA.oldSubscriptions
+      : USER_DATA.currentSubscriptions;
   return gapi.client.youtube.subscriptions
     .list({
       part: "snippet",
@@ -76,11 +81,14 @@ const getSubscriptions = (pageToken = null) => {
     .then(
       response => {
         response.result.items.forEach(element => {
-          USER_DATA.subscriptions.push(element.snippet.resourceId.channelId);
+          userData.add(element.snippet.resourceId.channelId);
         });
         nextPage = response.result.nextPageToken;
         if (nextPage)
-          return getSubscriptions((pageToken = response.result.nextPageToken));
+          return getSubscriptions(
+            type,
+            (pageToken = response.result.nextPageToken)
+          );
         else {
           notify("Subscriptions fetched successfully");
         }
@@ -93,35 +101,39 @@ const getSubscriptions = (pageToken = null) => {
 
 const transferSubscriptions = () => {
   notify("Transferring subsciptions...");
-  return Promise.allSettled(
-    USER_DATA.subscriptions.map(el =>
-      gapi.client.youtube.subscriptions.insert({
-        part: "snippet",
-        resource: {
-          snippet: {
-            resourceId: {
-              kind: "youtube#channel",
-              channelId: el
+  promises = [];
+  USER_DATA.oldSubscriptions.forEach(el => {
+    if (!USER_DATA.currentSubscriptions.has(el)) {
+      // New subscription
+      USER_DATA.newSubscriptionsCount += 1;
+      promises.push(
+        gapi.client.youtube.subscriptions.insert({
+          part: "snippet",
+          resource: {
+            snippet: {
+              resourceId: {
+                kind: "youtube#channel",
+                channelId: el
+              }
             }
           }
-        }
-      })
-    )
-  );
-};
-
-const getOldAccountData = () => {
-  return getSubscriptions();
+        })
+      );
+    }
+  });
+  return Promise.allSettled(promises);
 };
 
 signinOldAccount.onclick = () => {
   authenticate()
     .then(loadClient)
     .then(() => signinOldAccount.remove())
-    .then(() => getOldAccountData())
+    .then(() => getSubscriptions("old"))
     .then(() => {
-      notify("Data fetched successfully. Please sign in with your new account");
-      let content = `| ${USER_DATA.subscriptions.length} subscriptions |`;
+      notify(
+        "Old subscriptions fetched successfully. Please sign in with your new account"
+      );
+      let content = `| ${USER_DATA.oldSubscriptions.size} subscriptions |`;
       oldData.innerHTML = content;
     })
     .then(() => signinNewAccount.classList.remove("d-none"))
@@ -136,6 +148,8 @@ signinNewAccount.onclick = () => {
     .then(() => signinNewAccount.remove())
     .then(() => notify("Signed in with new account"))
     .then(() => transfer.classList.remove("d-none"))
+    .then(() => getSubscriptions("current"))
+    .then(() => notify("Current subscriptions fetched successfully!"))
     .catch(err => {
       notify(err);
     });
@@ -151,11 +165,17 @@ transfer.onclick = () => {
         }
       });
     })
-    .then(() =>
-      notify(
-        `${numSubscriptions}/${USER_DATA.subscriptions.length} subscriptions transferred successfully!`
-      )
-    )
+    .then(() => {
+      console.log(numSubscriptions, USER_DATA.newSubscriptionsCount);
+      if (numSubscriptions === USER_DATA.newSubscriptionsCount)
+        notify(
+          `${numSubscriptions}/${USER_DATA.newSubscriptionsCount} new subscriptions transferred successfully!`
+        );
+      else
+        notify(
+          `${numSubscriptions}/${USER_DATA.newSubscriptionsCount} new subscriptions transferred. You may have exhausted the quota. Please try remaining tomorrow`
+        );
+    })
     .catch(err => {
       notify("Error. Please try again");
     });

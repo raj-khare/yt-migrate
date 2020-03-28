@@ -1,4 +1,5 @@
 ### Steps
+
 1. Create a new project on [Google Cloud](http://console.cloud.google.com) and enable YouTube Data API under API & Services.
 2. Under credentials tab, create a new API key.
 3. Also create an OAUTH client and set 'Authorized JavaScript origins' as `http://localhost:PORT`.
