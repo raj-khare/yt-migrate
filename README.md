@@ -4,4 +4,5 @@
 2. Under credentials tab, create a new API key.
 3. Also create an OAUTH client and set 'Authorized JavaScript origins' as `http://localhost:80`.
 4. Clone the repo and paste the generated API key and Client id on `main.js` (Line 1 and 2).
-5. Open `index.html` in the browser.
+5. Run `python -m http.server 80` from the current directory.
+6. Open `http://localhost:80` in the browser.
