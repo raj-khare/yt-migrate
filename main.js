@@ -34,7 +34,7 @@ const USER_DATA = {
 };
 
 gapi.load("client:auth2", () => {
-  gapi.auth2.init({ client_id: CLIENT_ID });
+  gapi.auth2.init({ client_id: CLIENT_ID, fetch_basic_profile: false, scope: 'https://www.googleapis.com/auth/youtube' });
 });
 
 const notify = msg => {
@@ -45,7 +45,7 @@ const authenticate = () => {
   notify("Signing in...");
   return gapi.auth2
     .getAuthInstance()
-    .signIn({ scope: "https://www.googleapis.com/auth/youtube" })
+    .signIn({ scope: "https://www.googleapis.com/auth/youtube", prompt: 'select_account' })
     .then(
       () => {
         notify("Sign-in successful");
