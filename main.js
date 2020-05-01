@@ -59,7 +59,7 @@ const authenticate = () => {
         notify("Sign-in successful");
       },
       (err) => {
-        throw new Error("Sign-in failed. Please try again");
+        throw new Error(err.error);
       }
     );
 };
