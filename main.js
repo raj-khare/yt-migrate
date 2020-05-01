@@ -1,5 +1,6 @@
-const CLIENT_ID = "182026011814-1bonq5m0igijotcjiqjd5lerdbntgc3s.apps.googleusercontent.com";
-const API_KEY = "AIzaSyDgeRNKkb6ionKsxJrlBD7Z5ylkfNYCffE";
+const CLIENT_ID =
+  "1006418704112-vq6irgnq7tu7hkqq2meu41r08hd9d3q2.apps.googleusercontent.com";
+const API_KEY = "AIzaSyAPvTCaq88eRD3G-PSIMFqnBisTXaPWBPE";
 
 const signinOldAccount = document.getElementById("signin-old");
 const signinNewAccount = document.getElementById("signin-new");
@@ -9,17 +10,17 @@ const oldData = document.getElementById("old-data");
 
 //Polyfill
 if (!Promise.allSettled) {
-  Promise.allSettled = function(promises) {
+  Promise.allSettled = function (promises) {
     return Promise.all(
-      promises.map(p =>
+      promises.map((p) =>
         Promise.resolve(p).then(
-          value => ({
+          (value) => ({
             state: "fulfilled",
-            value
+            value,
           }),
-          reason => ({
+          (reason) => ({
             state: "rejected",
-            reason
+            reason,
           })
         )
       )
@@ -30,14 +31,18 @@ if (!Promise.allSettled) {
 const USER_DATA = {
   oldSubscriptions: new Set(),
   currentSubscriptions: new Set(),
-  newSubscriptionsCount: 0
+  newSubscriptionsCount: 0,
 };
 
 gapi.load("client:auth2", () => {
-  gapi.auth2.init({ client_id: CLIENT_ID, fetch_basic_profile: false, scope: 'https://www.googleapis.com/auth/youtube' });
+  gapi.auth2.init({
+    client_id: CLIENT_ID,
+    fetch_basic_profile: false,
+    scope: "https://www.googleapis.com/auth/youtube",
+  });
 });
 
-const notify = msg => {
+const notify = (msg) => {
   notifications.innerHTML = msg;
 };
 
@@ -45,12 +50,15 @@ const authenticate = () => {
   notify("Signing in...");
   return gapi.auth2
     .getAuthInstance()
-    .signIn({ scope: "https://www.googleapis.com/auth/youtube", prompt: 'select_account' })
+    .signIn({
+      scope: "https://www.googleapis.com/auth/youtube",
+      prompt: "select_account",
+    })
     .then(
       () => {
         notify("Sign-in successful");
       },
-      err => {
+      (err) => {
         throw new Error("Sign-in failed. Please try again");
       }
     );
@@ -60,7 +68,7 @@ const loadClient = () => {
   gapi.client.setApiKey(API_KEY);
   return gapi.client
     .load("https://www.googleapis.com/discovery/v1/apis/youtube/v3/rest")
-    .then(null, err => {
+    .then(null, (err) => {
       throw new Error("Error. Please try again");
     });
 };
@@ -76,11 +84,11 @@ const getSubscriptions = (type, pageToken = null) => {
       part: "snippet",
       mine: true,
       maxResults: 50,
-      pageToken: pageToken ? pageToken : undefined
+      pageToken: pageToken ? pageToken : undefined,
     })
     .then(
-      response => {
-        response.result.items.forEach(element => {
+      (response) => {
+        response.result.items.forEach((element) => {
           userData.add(element.snippet.resourceId.channelId);
         });
         nextPage = response.result.nextPageToken;
@@ -93,7 +101,7 @@ const getSubscriptions = (type, pageToken = null) => {
           notify("Subscriptions fetched successfully");
         }
       },
-      err => {
+      (err) => {
         throw new Error("Error fetching data. Please try again");
       }
     );
@@ -102,7 +110,7 @@ const getSubscriptions = (type, pageToken = null) => {
 const transferSubscriptions = () => {
   notify("Transferring subsciptions...");
   promises = [];
-  USER_DATA.oldSubscriptions.forEach(el => {
+  USER_DATA.oldSubscriptions.forEach((el) => {
     if (!USER_DATA.currentSubscriptions.has(el)) {
       // New subscription
       USER_DATA.newSubscriptionsCount += 1;
@@ -113,10 +121,10 @@ const transferSubscriptions = () => {
             snippet: {
               resourceId: {
                 kind: "youtube#channel",
-                channelId: el
-              }
-            }
-          }
+                channelId: el,
+              },
+            },
+          },
         })
       );
     }
@@ -137,7 +145,7 @@ signinOldAccount.onclick = () => {
       oldData.innerHTML = content;
     })
     .then(() => signinNewAccount.classList.remove("d-none"))
-    .catch(err => {
+    .catch((err) => {
       notify(err);
     });
 };
@@ -150,7 +158,7 @@ signinNewAccount.onclick = () => {
     .then(() => transfer.classList.remove("d-none"))
     .then(() => getSubscriptions("current"))
     .then(() => notify("Current subscriptions fetched successfully!"))
-    .catch(err => {
+    .catch((err) => {
       notify(err);
     });
 };
@@ -158,7 +166,7 @@ signinNewAccount.onclick = () => {
 transfer.onclick = () => {
   let numSubscriptions = 0;
   transferSubscriptions()
-    .then(results => {
+    .then((results) => {
       results.forEach((result, num) => {
         if (result.status == "fulfilled") {
           numSubscriptions += 1;
@@ -176,7 +184,7 @@ transfer.onclick = () => {
           `${numSubscriptions}/${USER_DATA.newSubscriptionsCount} new subscriptions transferred. You may have exhausted the quota. Please try remaining tomorrow`
         );
     })
-    .catch(err => {
+    .catch((err) => {
       notify("Error. Please try again");
     });
 };
