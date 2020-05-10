@@ -1,4 +1,3 @@
-// Error, Disable Btn, Subs
 const CLIENT_ID =
   "1006418704112-vq6irgnq7tu7hkqq2meu41r08hd9d3q2.apps.googleusercontent.com";
 const API_KEY = "AIzaSyAPvTCaq88eRD3G-PSIMFqnBisTXaPWBPE";
