@@ -1,6 +1,9 @@
+# yt-migrate
+### Import all your YouTube subscriptions from one account to another
+
 Open [yt-migrate](https://raj-khare.github.io/yt-migrate/) to use via default keys. However, quota may get exhausted to due API limits, so you can try again next day (only remaining subscriptions will get transferred) or use your own API keys by following the steps below.
 
-### Steps
+**Steps:**
 
 1. Create a new project on [Google Cloud](http://console.cloud.google.com) and enable YouTube Data API under API & Services.
 2. Under credentials tab, create a new API key.
