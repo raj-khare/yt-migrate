@@ -1,6 +1,6 @@
 const CLIENT_ID =
-  "1083432907433-vv19lcqrql7jru91bopvqocet4usog7b.apps.googleusercontent.com";
-const API_KEY = "AIzaSyCBFlx3PQ-6mNXm44mBYoYOZucuTW8P86U";
+  "CLIENT_ID";
+const API_KEY = "API_KEY";
 
 const signinOldAccount = document.getElementById("signin-old");
 const signinNewAccount = document.getElementById("signin-new");
