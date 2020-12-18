@@ -1,7 +1,9 @@
 # yt-migrate
 ### Import all your YouTube subscriptions from one account to another
 
-Open [yt-migrate](https://raj-khare.github.io/yt-migrate/) to use via default keys. However, quota may get exhausted to due API limits, so you can try again next day (only remaining subscriptions will get transferred) or use your own API keys by following the steps below.
+Open [yt-migrate](https://raj-khare.github.io/yt-migrate/) to use via default keys. However, quota may get exhausted to due API limits, so you can try again next day (only remaining subscriptions will get transferred) or use your own API keys by following the steps below. 
+
+Please use the below steps as my keys have crossed limits.
 
 **Steps:**
 
