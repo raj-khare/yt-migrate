@@ -90,6 +90,7 @@ const getSubscriptions = async (type, pageToken = null) => {
       mine: true,
       maxResults: 50,
       pageToken: pageToken ? pageToken : undefined,
+      order: 'alphabetical',
     });
     response.result.items.forEach((element) => {
       userData[element.snippet.resourceId.channelId] = element.snippet.title;
