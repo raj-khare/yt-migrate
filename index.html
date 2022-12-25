@@ -71,7 +71,8 @@
       </p>
     </div>
 
-    <script src="https://apis.google.com/js/api.js"></script>
+    <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoad()"></script>
+    <script async defer src="https://accounts.google.com/gsi/client" onload="gisInit()"></script>
     <script src="./main.js"></script>
   </body>
 </html>
