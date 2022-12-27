@@ -1,6 +1,6 @@
 const CLIENT_ID =
   "CLIENT_ID";
-const API_KEY = "API_KEY";
+let tokenClient;
 
 const signinOldAccount = document.getElementById("signin-old");
 const signinNewAccount = document.getElementById("signin-new");
@@ -39,46 +39,35 @@ const USER_DATA = {
   newSubscriptionsCount: 0,
 };
 
-gapi.load("client:auth2", () => {
-  gapi.auth2.init({
-    client_id: CLIENT_ID,
-    fetch_basic_profile: false,
-    scope: "https://www.googleapis.com/auth/youtube",
-  });
-});
-
 const notify = (msg) => {
   notifications.textContent = msg;
 };
 
-const authenticate = () => {
-  notify("Signing in...");
-  return gapi.auth2
-    .getAuthInstance()
-    .signIn({
-      scope: "https://www.googleapis.com/auth/youtube",
-      prompt: "select_account",
-    })
-    .then(
-      () => {
-        notify("Sign-in successful");
-      },
-      (err) => {
-        throw new Error(err.error);
-      }
+function gapiInit() {
+  gapi.client.init({}).then(function () {
+    gapi.client.load(
+      "https://www.googleapis.com/discovery/v1/apis/youtube/v3/rest"
     );
-};
+  });
+}
 
-const loadClient = () => {
-  gapi.client.setApiKey(API_KEY);
-  return gapi.client
-    .load("https://www.googleapis.com/discovery/v1/apis/youtube/v3/rest")
-    .then(null, () => {
-      throw new Error("Client loading failed. Please try again");
-    });
-};
+function gapiLoad() {
+  gapi.load("client", gapiInit);
+}
 
-const getSubscriptions = async (type, pageToken = null) => {
+function gisInit() {
+  tokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: CLIENT_ID,
+    scope: "https://www.googleapis.com/auth/youtube",
+    callback: "", // defined at request time
+  });
+}
+
+const getSubscriptions = async (
+  type,
+  pageToken = null,
+  callback = () => {}
+) => {
   notify(`Fetching your ${type} subscriptions...`);
   try {
     const userData =
@@ -90,7 +79,7 @@ const getSubscriptions = async (type, pageToken = null) => {
       mine: true,
       maxResults: 50,
       pageToken: pageToken ? pageToken : undefined,
-      order: 'alphabetical',
+      order: "alphabetical",
     });
     response.result.items.forEach((element) => {
       userData[element.snippet.resourceId.channelId] = element.snippet.title;
@@ -101,6 +90,7 @@ const getSubscriptions = async (type, pageToken = null) => {
     else {
       notify("Subscriptions fetched successfully");
     }
+    callback();
   } catch (err) {
     throw new Error(err.result.error.errors[0].reason);
   }
@@ -143,36 +133,37 @@ const transferSubscriptions = () => {
 };
 
 signinOldAccount.onclick = async () => {
-  try {
-    await authenticate();
-    await loadClient();
+  tokenClient.callback = (resp) => {
+    if (resp.error !== undefined) notify(resp.error);
+
     signinOldAccount.remove();
-    await getSubscriptions("old");
-    notify(
-      "Old subscriptions fetched successfully. Please sign in with your new account"
-    );
-    let content = `| ${
-      Object.keys(USER_DATA.oldSubscriptions).length
-    } subscriptions |`;
-    oldData.textContent = content;
-    signinNewAccount.classList.remove("d-none");
-  } catch (err) {
-    notify(err.message);
-  }
+    getSubscriptions("old", null, () => {
+      notify(
+        "Old subscriptions fetched successfully. Please sign in with your new account"
+      );
+      let content = `| ${
+        Object.keys(USER_DATA.oldSubscriptions).length
+      } subscriptions |`;
+      oldData.textContent = content;
+      signinNewAccount.classList.remove("d-none");
+    });
+  };
+  tokenClient.requestAccessToken();
 };
 
 signinNewAccount.onclick = async () => {
-  try {
-    await authenticate();
-    await loadClient();
+  tokenClient.callback = (resp) => {
+    if (resp.error !== undefined) {
+      throw resp;
+    }
     signinNewAccount.remove();
-    notify("Signed in with new account");
-    await getSubscriptions("current");
-    notify("Current subscriptions fetched successfully!");
-    transfer.classList.remove("d-none");
-  } catch (err) {
-    notify(err.message);
-  }
+    getSubscriptions("current", null, () => {
+      notify("Current subscriptions fetched successfully!");
+      transfer.classList.remove("d-none");
+      dryrun.classList.remove("d-none");
+    });
+  };
+  tokenClient.requestAccessToken();
 };
 
 const addSubscriptionToDom = (name, el) => {
