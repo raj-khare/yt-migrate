@@ -15,6 +15,8 @@ Please use the below steps as my keys have crossed limits.
    - Link: https://console.cloud.google.com/apis/credentials/consent
 4. Also create an OAUTH client and add two entries to 'Authorized JavaScript origins': `http://localhost:8080` and `http://localhost`
     - Link: https://console.cloud.google.com/apis/credentials/oauthclient
+5. Add Old account and new account (by email) as Test users
+    - Link: https://console.cloud.google.com/apis/credentials/consent
 5. Clone the repo and paste the generated Client id on `main.js` (Line 1).
 6. Run `python -m http.server 8080` from the current directory.
 7. Open `http://localhost:8080` in the browser.
